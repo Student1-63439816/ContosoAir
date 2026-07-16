@@ -1,0 +1,71 @@
+Essentials on Azure DevOps Services and GitHub Only
+Exit Lab
+Lab Manual
+Credentials
+Module 9 (Alternative): GitHub Integration, Lab 1: GitHub with Azure Boards and Azure Pipelines, Exercise 1: GitHub with Azure Pipelines
+Task 3: Configuring a Continuous Integration Pipeline
+The previous task should have redirected you to Azure DevOps | Pipelines | Select section. This is using GitHub YAML as the option for repository.
+
+If you haven't created a self hosted agent previously, follow the steps in Module 4: Azure Pipelines, Lab 1: Configuring CI/CD Pipelines, Exercise 1: Configuring CI/CD Pipelines as Code With YAML in Azure DevOps, Task 3: Configuring a self-hosted agent to create one.
+
+Install npm on your lab machine. You can use the prebuilt installer on https://nodejs.org/en/download/prebuilt-installer. After the installation is complete, from the Windows Services, restart the Azure Pipelines Agent service.
+module10-L1-exercise1-11-restart.png
+
+Select ContosoAir forked repo for Select a repository.
+
+module10-L1-exercise1-11-select-forkedrepo.png
+
+Note that the Node.js template is shown first in the list of suggested templates as a starting point based on an analysis of our source project. We'll replace the contents with the final YAML required for our project.
+
+Select Node.JS as the recommended template.
+
+module10-L1-exercise1-12-nodejs-template.png
+
+Replace the default template with the YAML below.
+
+YAML
+TypeCopy
+   pool:
+     name: default
+   trigger:
+     - master
+   steps:
+     - task: CopyFiles@2
+       displayName: 'Copy Files to: $(build.artifactstagingdirectory)/Templates'
+       inputs:
+         SourceFolder: deployment
+         Contents: '*.json'
+         TargetFolder: '$(build.artifactstagingdirectory)/Templates'
+     - task: Npm@1
+       displayName: 'npm custom'
+       inputs:
+         command: custom
+         verbose: false
+         customCommand: 'install --production'
+     - task: ArchiveFiles@2
+       displayName: 'Archive $(Build.SourcesDirectory)'
+       inputs:
+         rootFolderOrFile: '$(Build.SourcesDirectory)'
+         includeRootFolder: false
+     - task: PublishPipelineArtifact@1
+       inputs:
+         targetPath: '$(build.artifactstagingdirectory)'
+         artifact: 'drop'
+         publishLocation: 'pipeline'
+Click Save and run.
+
+module10-L1-exercise1-13-saveandrun.png
+
+Confirm the Save and run to commit the YAML definition directly to the master branch of the repo.
+
+module10-L1-exercise1-14-saveandrun2.png
+
+A message will be displayed asking permission to access the Default build agent pool (if you do not see it, click on the running Build job to navigate to the logs page to view the message). Click on View and click on Permit.
+
+Follow the build through to completion.
+
+module10-L1-exercise1-15-build1.1.png
+
+Go to the Table of Contents
+
+54 Hr 58 Min Remaining
